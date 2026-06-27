@@ -1,0 +1,12 @@
+{
+  "name": "mindease-wellness-companion",
+  "version": "1.0.0",
+  "description": "GenAI-powered mental wellness companion for Indian exam students. PromptWars 2026.",
+  "type": "module",
+  "scripts": {
+    "test": "node tests.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self';" />
+  <title>MindEase – Your Exam Wellness Companion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- Skip to content for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Crisis banner (hidden by default) -->
+  <div id="crisis-banner" class="crisis-banner" role="alert" aria-live="assertive" hidden>
+    <div class="crisis-inner">
+      <span class="crisis-icon" aria-hidden="true">💙</span>
+      <div>
+        <p class="crisis-title">You're not alone. Please reach out.</p>
+        <p class="crisis-text">This app is a wellness companion, not a crisis service. If you're feeling overwhelmed or unsafe, trained counsellors are available right now — for free, 24/7.</p>
+        <div class="crisis-helplines">
+          <a href="tel:14416" class="helpline-btn">📞 Tele-MANAS: 14416</a>
+          <a href="tel:18005990019" class="helpline-btn">📞 KIRAN: 1800-599-0019</a>
+        </div>
+      </div>
+      <button class="crisis-close" onclick="dismissCrisis()" aria-label="Dismiss this message">✕</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header" role="banner">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon" aria-hidden="true">🌿</span>
+        <span class="logo-text">MindEase</span>
+      </div>
+      <p class="logo-tagline">Exam Wellness Companion</p>
+      <nav class="main-nav" role="navigation" aria-label="Main navigation">
+        <button class="nav-btn active" onclick="showSection('journal')" aria-current="page" id="nav-journal">Journal</button>
+        <button class="nav-btn" onclick="showSection('dashboard')" id="nav-dashboard">My Trends</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" role="main">
+
+    <!-- ===== JOURNAL SECTION ===== -->
+    <section id="section-journal" class="section" aria-labelledby="journal-heading">
+      <div class="container">
+        <div class="section-intro">
+          <h1 id="journal-heading">How are you doing today?</h1>
+          <p class="section-sub">Write freely. MindEase uses AI to find hidden patterns in your stress — things a mood rating alone can never surface.</p>
+        </div>
+
+        <div class="disclaimer-bar" role="note">
+          <span aria-hidden="true">ℹ️</span>
+          MindEase is a supportive tool, not a substitute for professional help.
+          If you're in distress, please contact <strong>Tele-MANAS 14416</strong>.
+        </div>
+
+        <form id="journal-form" class="journal-card" novalidate>
+          <!-- Exam context -->
+          <div class="form-group">
+            <label for="exam-select" class="form-label">Which exam are you preparing for?</label>
+            <select id="exam-select" name="exam" class="form-select" required aria-required="true">
+              <option value="">Select your exam…</option>
+              <option value="JEE">JEE (Mains / Advanced)</option>
+              <option value="NEET">NEET UG / PG</option>
+              <option value="CUET">CUET</option>
+              <option value="CAT">CAT</option>
+              <option value="GATE">GATE</option>
+              <option value="UPSC">UPSC (Civil Services)</option>
+              <option value="Board">Board Exams (Class 10/12)</option>
+              <option value="Other">Other competitive exam</option>
+            </select>
+          </div>
+
+          <!-- Mood slider -->
+          <div class="form-group">
+            <label for="mood-slider" class="form-label">
+              Overall mood today
+              <span id="mood-label" class="mood-label" aria-live="polite">😐 Neutral</span>
+            </label>
+            <input
+              type="range"
+              id="mood-slider"
+              name="mood"
+              min="1"
+              max="5"
+              value="3"
+              step="1"
+              class="mood-range"
+              aria-describedby="mood-label"
+              oninput="updateMoodLabel(this.value)"
+            />
+            <div class="mood-scale" aria-hidden="true">
+              <span>😔 Very low</span>
+              <span>😊 Great</span>
+            </div>
+          </div>
+
+          <!-- Sleep hours -->
+          <div class="form-group">
+            <label for="sleep-hours" class="form-label">Hours of sleep last night</label>
+            <input
+              type="number"
+              id="sleep-hours"
+              name="sleep"
+              min="0"
+              max="24"
+              placeholder="e.g. 6"
+              class="form-input"
+              aria-describedby="sleep-hint"
+            />
+            <span id="sleep-hint" class="form-hint">Students under exam pressure often under-report this.</span>
+          </div>
+
+          <!-- Free text journal -->
+          <div class="form-group">
+            <label for="journal-text" class="form-label">
+              What's on your mind? <span class="required-star" aria-label="required">*</span>
+            </label>
+            <textarea
+              id="journal-text"
+              name="journal"
+              rows="6"
+              maxlength="2000"
+              placeholder="Write freely — about today's study session, what you're worried about, what went well, how your family or friends made you feel, anything at all. The more honest you are, the better MindEase can help."
+              class="form-textarea"
+              required
+              aria-required="true"
+              aria-describedby="char-count journal-hint"
+              oninput="updateCharCount(this)"
+            ></textarea>
+            <div class="textarea-footer">
+              <span id="journal-hint" class="form-hint">Min 30 characters. Be as honest as you like — this stays on your device.</span>
+              <span id="char-count" class="char-count" aria-live="polite">0 / 2000</span>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" id="analyse-btn" class="btn-primary" aria-describedby="submit-hint">
+            <span class="btn-text">Analyse with AI</span>
+            <span class="btn-icon" aria-hidden="true">✨</span>
+          </button>
+          <span id="submit-hint" class="form-hint" style="text-align:center;display:block;margin-top:8px;">Your entry is sent securely to Gemini AI for analysis.</span>
+        </form>
+
+        <!-- Loading state -->
+        <div id="loading-state" class="loading-card" hidden aria-live="polite" aria-label="Analysing your entry, please wait">
+          <div class="spinner" aria-hidden="true"></div>
+          <p class="loading-text">Gemini is reading between the lines…</p>
+          <p class="loading-sub">Surfacing hidden patterns in your entry</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="error-state" class="error-card" hidden role="alert">
+          <span aria-hidden="true">⚠️</span>
+          <p id="error-message">Something went wrong. Please try again.</p>
+          <button class="btn-secondary" onclick="resetForm()" aria-label="Dismiss error and try again">Try Again</button>
+        </div>
+
+        <!-- Results card -->
+        <div id="results-card" class="results-card" hidden aria-live="polite" aria-label="Your wellness analysis">
+          <div class="results-header">
+            <h2 id="results-heading">Your Wellness Insight</h2>
+            <span class="results-date" id="results-date"></span>
+          </div>
+
+          <div class="insight-block empathy-block">
+            <h3 class="insight-title">💬 How I see your day</h3>
+            <p id="result-reflection" class="insight-text"></p>
+          </div>
+
+          <div class="insights-grid">
+            <div class="insight-block triggers-block">
+              <h3 class="insight-title">🔍 Hidden stress triggers found</h3>
+              <ul id="result-triggers" class="insight-list" aria-label="Detected stress triggers"></ul>
+            </div>
+            <div class="insight-block patterns-block">
+              <h3 class="insight-title">📈 Emotional patterns</h3>
+              <ul id="result-patterns" class="insight-list" aria-label="Emotional patterns"></ul>
+            </div>
+          </div>
+
+          <div class="insight-block coping-block">
+            <h3 class="insight-title">🛠️ Your personalised coping strategy</h3>
+            <p id="result-coping" class="insight-text highlight-text"></p>
+          </div>
+
+          <div class="insight-block mindfulness-block">
+            <h3 class="insight-title">🧘 Mindfulness exercise for right now</h3>
+            <p id="result-mindfulness" class="insight-text"></p>
+          </div>
+
+          <div class="insight-block encouragement-block">
+            <h3 class="insight-title">⭐ A word for you</h3>
+            <p id="result-encouragement" class="insight-text warm-text"></p>
+          </div>
+
+          <button class="btn-secondary full-width" onclick="resetForm()">Write Another Entry</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DASHBOARD SECTION ===== -->
+    <section id="section-dashboard" class="section" hidden aria-labelledby="dashboard-heading">
+      <div class="container">
+        <div class="section-intro">
+          <h1 id="dashboard-heading">Your Wellness Trends</h1>
+          <p class="section-sub">Patterns across all your journal entries — the kind of insight only AI-powered analysis can surface.</p>
+        </div>
+
+        <!-- Empty state -->
+        <div id="dashboard-empty" class="empty-state" hidden>
+          <span class="empty-icon" aria-hidden="true">📔</span>
+          <h2>No entries yet</h2>
+          <p>Write your first journal entry and MindEase will start mapping your wellness patterns here.</p>
+          <button class="btn-primary" onclick="showSection('journal')">Write First Entry</button>
+        </div>
+
+        <!-- Dashboard content -->
+        <div id="dashboard-content" hidden>
+          <!-- Summary stats -->
+          <div class="stats-row" role="region" aria-label="Summary statistics">
+            <div class="stat-card">
+              <span class="stat-number" id="stat-entries">0</span>
+              <span class="stat-label">Total Entries</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number" id="stat-avg-mood">—</span>
+              <span class="stat-label">Avg Mood</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number" id="stat-streak">0</span>
+              <span class="stat-label">Day Streak</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number" id="stat-avg-sleep">—</span>
+              <span class="stat-label">Avg Sleep (hrs)</span>
+            </div>
+          </div>
+
+          <!-- Mood trend chart -->
+          <div class="chart-card" role="region" aria-label="Mood trend chart">
+            <h2 class="chart-title">Mood Over Time</h2>
+            <div class="chart-wrap" aria-label="Mood trend visualisation">
+              <canvas id="mood-chart" width="600" height="180" aria-label="Mood trend line chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Top triggers -->
+          <div class="chart-card" role="region" aria-label="Most frequent stress triggers">
+            <h2 class="chart-title">Top Stress Triggers (AI-detected)</h2>
+            <div id="triggers-bars" class="triggers-bars" aria-label="Trigger frequency bars"></div>
+          </div>
+
+          <!-- Recent entries -->
+          <div class="chart-card" role="region" aria-label="Recent journal entries">
+            <h2 class="chart-title">Recent Entries</h2>
+            <ul id="entries-list" class="entries-list" aria-label="Recent journal entries list"></ul>
+          </div>
+
+          <button class="btn-danger" onclick="confirmClearData()" aria-label="Clear all saved journal entries">Clear All Data</button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-inner">
+      <p>MindEase is a wellness companion for exam students. It is <strong>not</strong> a medical device or crisis service.</p>
+      <p>In distress? Call <strong>Tele-MANAS 14416</strong> (Govt. of India, free, 24/7) or <strong>KIRAN 1800-599-0019</strong></p>
+      <p class="footer-note">Built with Google Gemini AI · PromptWars 2026 · Data stays on your device</p>
+    </div>
+  </footer>
+
+  <script src="/js/crisis.js"></script>
+  <script src="/js/storage.js"></script>
+  <script src="/js/chart.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
