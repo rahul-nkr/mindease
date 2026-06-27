@@ -81,7 +81,7 @@ Journal entry:
 Analyse this entry and return the JSON response.`;
 
   // Call Gemini API
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
   const geminiPayload = {
     system_instruction: {
