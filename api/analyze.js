@@ -1,7 +1,7 @@
 /**
- * api/analyze.js — Vercel Serverless Function (Gemini Proxy)
+ * api/analyze.js — Vercel Serverless Function (NVIDIA NIM Proxy)
  *
- * Security: Gemini API key is read ONLY from server-side env var.
+ * Security: NVIDIA API key is read ONLY from server-side env var.
  * It is never sent to the client or stored in the repo.
  */
 
@@ -33,9 +33,9 @@ export default async function handler(req, res) {
   }
 
   // Get API key from environment variable (set in Vercel dashboard)
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.NVIDIA_API_KEY;
   if (!apiKey) {
-    console.error('GEMINI_API_KEY environment variable is not set.');
+    console.error('NVIDIA_API_KEY environment variable is not set.');
     return res.status(503).json({ error: 'AI service not configured.' });
   }
 
@@ -80,52 +80,52 @@ Journal entry:
 
 Analyse this entry and return the JSON response.`;
 
-  // Call Gemini API
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  // Call NVIDIA NIM API
+  const nvidiaUrl = 'https://integrate.api.nvidia.com/v1/chat/completions';
 
-  const geminiPayload = {
-    system_instruction: {
-      parts: [{ text: systemInstruction }]
-    },
-    contents: [{
-      role: 'user',
-      parts: [{ text: userPrompt }]
-    }],
-    generationConfig: {
-      temperature: 0.4,
-      topP: 0.9,
-      maxOutputTokens: 1024,
-      responseMimeType: 'application/json'
-    },
-    safetySettings: [
-      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
-    ]
+  const nvidiaPayload = {
+    model: 'meta/llama-3.3-70b-instruct',
+    messages: [
+      {
+        role: 'system',
+        content: systemInstruction
+      },
+      {
+        role: 'user',
+        content: userPrompt
+      }
+    ],
+    temperature: 0.4,
+    top_p: 0.9,
+    max_tokens: 1024,
+    response_format: { type: 'json_object' }
   };
 
   try {
-    const geminiRes = await fetch(geminiUrl, {
+    const nvidiaRes = await fetch(nvidiaUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(geminiPayload)
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(nvidiaPayload)
     });
 
-    const geminiData = await geminiRes.json();
+    const nvidiaData = await nvidiaRes.json();
 
-    if (!geminiRes.ok) {
-      console.error('Gemini error:', geminiRes.status, JSON.stringify(geminiData));
-      if (geminiRes.status === 429) {
+    if (!nvidiaRes.ok) {
+      console.error('NVIDIA API error:', nvidiaRes.status, JSON.stringify(nvidiaData));
+      if (nvidiaRes.status === 429) {
         return res.status(429).json({ error: 'Too many requests. Please wait a moment and try again.' });
       }
       return res.status(502).json({ error: 'AI service error. Please try again.' });
     }
 
-    // Extract text from Gemini response
-    const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+    // Extract text from NVIDIA response
+    const rawText = nvidiaData?.choices?.[0]?.message?.content;
     if (!rawText) {
-      console.error('Empty Gemini response:', JSON.stringify(geminiData));
+      console.error('Empty NVIDIA response:', JSON.stringify(nvidiaData));
       return res.status(502).json({ error: 'Empty response from AI. Please try again.' });
     }
 
